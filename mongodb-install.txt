@@ -1,0 +1,52 @@
+// Fedora //
+
+// Configure package 
+
+vim /etc/yum.repos.d/mongodb-org-7.0.repo
+
+[mongodb-org-7.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/9/mongodb-org/7.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc
+
+// Setting up Ulimit
+// Command : ulimit <parameter> <value>
+
+-f (file size): unlimited
+-t (cpu time): unlimited
+-v (virtual memory): unlimited
+-l (locked-in-memory size): unlimited
+-n (open files): 64000
+-m (memory size): unlimited
+-u (processes/threads): 64000
+
+// Installing SELinux
+
+sudo yum install git make checkpolicy policycoreutils selinux-policy-devel
+
+git clone https://github.com/mongodb/mongodb-selinux
+
+cd mongodb-selinux
+
+make
+
+sudo make install
+
+// Init 
+
+sudo systemctl daemon-reload
+
+sudo systemctl start mongod
+
+sudo systemctl enable mongod
+
+// Problem
+
+mongosh: OpenSSL configuration error: 00B8E1BCB67F0000:error:030000A9:digital envelope routines:alg_module_init:unknown option:../deps/openssl/openssl/crypto/evp/evp_cnf.c:61:name=rh-allow-sha1-signatures, value=yes
+
+## Fix (Choose One)
+
+sudo dnf install -qy mongodb-mongosh-shared-openssl3
+sudo yum install mongodb-mongosh-shared-openssl3
